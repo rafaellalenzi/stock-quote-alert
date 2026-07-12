@@ -85,7 +85,7 @@ while (true)
             {
                 From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
                 Subject = "Alerta de venda do ativo " + args[0],
-                Body = "O preço do ativo " + args[0] + " atingiu o valor de venda: " + precoAtual,
+                Body = buildEmailBody(args[0], precoAtual, precoVenda, result, "atingiu o preço de venda de referência", "Considere vender o ativo."),
                 IsBodyHtml = false
             };
             mensagem.To.Add(config.AlertEmail);
@@ -107,7 +107,7 @@ while (true)
             {
                 From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
                 Subject = "Alerta de compra do ativo " + args[0],
-                Body = "O preço do ativo " + args[0] + " atingiu o valor de compra: " + precoAtual,
+                Body = buildEmailBody(args[0], precoAtual, precoCompra, result, "atingiu o preço de compra de referência", "Considere comprar o ativo."),
                 IsBodyHtml = false
             };
             mensagem.To.Add(config.AlertEmail);
@@ -122,4 +122,19 @@ while (true)
     }
 
     await Task.Delay(TimeSpan.FromSeconds(30));
+}
+
+static string buildEmailBody(string ativo, decimal precoAtual, decimal precoLimite, Result result, string tipoAlerta, string sugestao)
+{
+    var variacao = result.RegularMarketChangePercent.HasValue
+        ? $"{(result.RegularMarketChangePercent.Value >= 0 ? "+" : "")}{result.RegularMarketChangePercent.Value:0.00}%"
+        : "Sem dados de variação disponíveis";
+
+    return
+        $"O ativo {ativo} atingiu R$ {precoAtual:0.00}, {tipoAlerta} de R$ {precoLimite:0.00}.\n\n" +
+        $"Variação no dia: {variacao}\n" +
+        $"Fechamento anterior: R$ {result.RegularMarketPreviousClose:0.00}\n" +
+        $"Faixa do dia: R$ {result.RegularMarketDayLow:0.00} - R$ {result.RegularMarketDayHigh:0.00}\n" +
+        $"Faixa de 52 semanas: R$ {result.FiftyTwoWeekLow:0.00} - R$ {result.FiftyTwoWeekHigh:0.00}\n\n" +
+        $"\nSugestão: {sugestao}";
 }
