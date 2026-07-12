@@ -1,0 +1,12 @@
+{
+  "AlertEmail": "email-que-será-notifcado",
+  "Smtp": {
+    "Host": "smtp.gmail.com",
+    "Port": 587,
+    "EnableSsl": true,
+    "Username": "seu-email",
+    "Password": "senha-app -> https://myaccount.google.com/apppasswords",
+    "FromAddress": "seu-email",
+    "FromName": "Stock Quote Alert"
+  }
+}
