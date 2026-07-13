@@ -1,7 +1,4 @@
 ﻿using System.Globalization;
-using System.Text.Json;
-using System.Net.Mail;
-using System.Net;
 
 class Program
 {
@@ -53,42 +50,15 @@ class Program
             return;
         }
 
-        AppConfig? config;
-        try
-        {
-            string json = File.ReadAllText("configuration.json");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            config = JsonSerializer.Deserialize<AppConfig>(json, options);
-
-            if (config == null)
-            {
-                throw new Exception();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ERROR: Erro ao carregar a configuração: {ex.Message}");
-            Console.WriteLine("Verifique se o arquivo configuration.json está no formato correto e contém todas as informações necessárias como em configuration.json.example.");
-            return;
-        }
-
-        var httpClient = new HttpClient();
-        string url = $"https://brapi.dev/api/quote/{args[0]}";
-
-        var smtpClient = new SmtpClient(config.Smtp.Host, config.Smtp.Port)
-        {
-            EnableSsl = config.Smtp.EnableSsl,
-            Credentials = new NetworkCredential(config.Smtp.Username, config.Smtp.Password)
-        };
+        IBrapi brapi = new Brapi();
+        IMailer mailer = new Mailer();
 
         bool sellAssetAlert = false;
         bool buyAssetAlert = false;
 
         while (true)
         {
-            string responseBody = await httpClient.GetStringAsync(url);
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(responseBody);
+            var apiResponse = await brapi.GetStockQuoteAsync(args[0]);
 
             var result = apiResponse?.Results?.FirstOrDefault();
 
@@ -104,15 +74,17 @@ class Program
             {
                 if (!sellAssetAlert)
                 {
-                    var mensagem = new MailMessage
-                    {
-                        From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
-                        Subject = "Alerta de venda do ativo " + args[0],
-                        Body = BuildEmailBody(args[0], currentPrice, sellPrice, result, "atingiu o preço de venda de referência", "Considere vender o ativo."),
-                        IsBodyHtml = false
-                    };
-                    mensagem.To.Add(config.AlertEmail);
-                    await smtpClient.SendMailAsync(mensagem);
+                    var Subject = "Alerta de venda do ativo " + args[0];
+                    var Body = BuildEmailBody(
+                        args[0], 
+                        currentPrice, 
+                        sellPrice, 
+                        result, 
+                        "atingiu o preço de venda de referência", 
+                        "Considere vender o ativo."
+                    );
+
+                    await mailer.SendEmailAsync(Subject, Body);
 
                     sellAssetAlert = true;
                 }
@@ -126,15 +98,17 @@ class Program
             {
                 if (!buyAssetAlert)
                 {
-                    var mensagem = new MailMessage
-                    {
-                        From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
-                        Subject = "Alerta de compra do ativo " + args[0],
-                        Body = BuildEmailBody(args[0], currentPrice, buyPrice, result, "atingiu o preço de compra de referência", "Considere comprar o ativo."),
-                        IsBodyHtml = false
-                    };
-                    mensagem.To.Add(config.AlertEmail);
-                    await smtpClient.SendMailAsync(mensagem);
+                    var Subject = "Alerta de compra do ativo " + args[0];
+                    var Body = BuildEmailBody(
+                        args[0], 
+                        currentPrice, 
+                        buyPrice, 
+                        result, 
+                        "atingiu o preço de compra de referência", 
+                        "Considere comprar o ativo."
+                    );
+
+                    await mailer.SendEmailAsync(Subject, Body);
 
                     buyAssetAlert = true;
                 }
