@@ -63,7 +63,6 @@ bool buyAssetAlert = false;
 while (true)
 {
     string responseBody = await httpClient.GetStringAsync(url);
-    Console.WriteLine($"{responseBody}");
 
     var apiResponse = JsonSerializer.Deserialize<ApiResponse>(responseBody);
 
