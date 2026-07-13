@@ -5,7 +5,7 @@ using System.Net;
 
 if (args.Length != 3)
 {
-    Console.WriteLine("ERROR: uso incorreto. Esperado: stock-quote-alert.exe <ATIVO> <PRECO_VENDA> <PRECO_COMPRA>");
+    Console.WriteLine("ERROR: Uso incorreto. Esperado: stock-quote-alert.exe <ATIVO> <PRECO_VENDA> <PRECO_COMPRA>");
     return;
 }
 
@@ -15,19 +15,19 @@ bool buyPriceValid = decimal.TryParse(args[2], NumberStyles.Number, CultureInfo.
 
 if (!sellPriceValid)
 {
-    Console.WriteLine($"ERROR: preço de venda inválido: '{args[1]}'");
+    Console.WriteLine($"ERROR: O preço de venda inválido: '{args[1]}'");
     return;
 }
 
 if (!buyPriceValid)
 {
-    Console.WriteLine($"ERROR: preço de compra inválido: '{args[2]}'");
+    Console.WriteLine($"ERROR: O preço de compra inválido: '{args[2]}'");
     return;
 }
 
 if (buyPrice >= sellPrice)
 {
-    Console.WriteLine("ERROR: preço de compra deve ser menor que o preço de venda.");
+    Console.WriteLine("ERROR: O preço de compra deve ser menor que o preço de venda.");
     return;
 }
 
@@ -45,7 +45,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"ERROR: erro ao carregar a configuração: {ex.Message}");
+    Console.WriteLine($"ERROR: Erro ao carregar a configuração: {ex.Message}");
     return;
 }
 
@@ -71,7 +71,7 @@ while (true)
 
     if (result == null || result.RegularMarketPrice == null)
     {
-        Console.WriteLine("ERROR: não foi possível obter o preço do ativo.");
+        Console.WriteLine("ERROR: Não foi possível obter o preço do ativo.");
         return;
     }
 
@@ -136,5 +136,5 @@ static string BuildEmailBody(string asset, decimal currentPrice, decimal limitPr
         $"Fechamento anterior: R$ {result.RegularMarketPreviousClose:0.00}\n" +
         $"Faixa do dia: R$ {result.RegularMarketDayLow:0.00} - R$ {result.RegularMarketDayHigh:0.00}\n" +
         $"Faixa de 52 semanas: R$ {result.FiftyTwoWeekLow:0.00} - R$ {result.FiftyTwoWeekHigh:0.00}\n\n" +
-        $"\nSugestão: {suggestion}";
+        $"Sugestão: {suggestion}";
 }
