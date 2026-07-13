@@ -1,5 +1,5 @@
 {
-  "AlertEmail": "email-que-será-notifcado",
+  "AlertEmail": "email-que-será-notificado",
   "Smtp": {
     "Host": "smtp.gmail.com",
     "Port": 587,
