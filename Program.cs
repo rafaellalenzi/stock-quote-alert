@@ -84,8 +84,8 @@ class Program
             {
                 if (!sellAssetAlert)
                 {
-                    var Subject = "Alerta de venda do ativo " + args[0];
-                    var Body = BuildEmailBody(
+                    var subject = "Alerta de venda do ativo " + args[0];
+                    var body = BuildEmailBody(
                         args[0], 
                         currentPrice, 
                         sellPrice, 
@@ -94,7 +94,7 @@ class Program
                         "Considere vender o ativo."
                     );
 
-                    await mailer.SendEmailAsync(Subject, Body);
+                    await mailer.SendEmailAsync(subject, body);
 
                     sellAssetAlert = true;
                 }
@@ -108,8 +108,8 @@ class Program
             {
                 if (!buyAssetAlert)
                 {
-                    var Subject = "Alerta de compra do ativo " + args[0];
-                    var Body = BuildEmailBody(
+                    var subject = "Alerta de compra do ativo " + args[0];
+                    var body = BuildEmailBody(
                         args[0], 
                         currentPrice, 
                         buyPrice, 
@@ -118,7 +118,7 @@ class Program
                         "Considere comprar o ativo."
                     );
 
-                    await mailer.SendEmailAsync(Subject, Body);
+                    await mailer.SendEmailAsync(subject, body);
 
                     buyAssetAlert = true;
                 }
