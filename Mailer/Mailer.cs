@@ -5,6 +5,7 @@ using System.Text.Json;
 public class Mailer: IMailer
 {
     private readonly MailerConfig _config;
+
     public Mailer()
     {
         string json = File.ReadAllText("configuration.json");
