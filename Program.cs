@@ -51,7 +51,17 @@ class Program
         }
 
         IBrapi brapi = new Brapi();
-        IMailer mailer = new Mailer();
+
+        IMailer mailer;
+        try
+        {
+            mailer = new Mailer();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+            return;
+        }
 
         bool sellAssetAlert = false;
         bool buyAssetAlert = false;

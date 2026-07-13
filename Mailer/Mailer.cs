@@ -4,35 +4,34 @@ using System.Text.Json;
 
 public class Mailer: IMailer
 {
-    private readonly MailerConfig? _config;
+    private readonly MailerConfig _config;
     public Mailer()
     {
+        string json = File.ReadAllText("configuration.json");
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    
         MailerConfig? config;
         try
         {
-            string json = File.ReadAllText("configuration.json");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             config = JsonSerializer.Deserialize<MailerConfig>(json, options);
-
-            _config = config;
-            AssertConfiguration();
         }
-        catch (Exception ex)
+        catch (JsonException ex)
         {
-            Console.WriteLine($"ERROR: Erro ao carregar a configuração: {ex.Message}");
-            Console.WriteLine("Verifique se o arquivo configuration.json está no formato correto e contém todas as informações necessárias como em configuration.json.example.");
-            return;
+            throw new InvalidOperationException(
+                "O arquivo configuration.json está inválido. Verifique se o arquivo está no formato correto e contém todas as informações necessárias como em configuration.json.example.", ex);
         }
+
+        if (config == null)
+        {
+            throw new InvalidOperationException("O arquivo configuration.json está vazio ou inválido.");
+        }
+
+        _config = config;
+        AssertConfiguration();
     }
 
     public async Task SendEmailAsync(string subject, string body)
     {
-        if (_config == null)
-        {
-            Console.WriteLine("ERROR: A configuração do e-mail não foi carregada.");
-            return;
-        }
-
         if (string.IsNullOrWhiteSpace(subject))
         {
             Console.WriteLine("ERROR: O assunto do e-mail não pode ser vazio.");
@@ -64,13 +63,8 @@ public class Mailer: IMailer
         }
     }
 
-    private MailerConfig AssertConfiguration()
+    private void AssertConfiguration()
     {
-        if (_config == null)
-        {
-            throw new InvalidOperationException("A configuração do MailerService não foi carregada corretamente.");
-        }
-
         if (string.IsNullOrWhiteSpace(_config.AlertEmail))
         {
             throw new InvalidOperationException("O endereço de e-mail de alerta não está configurado.");
@@ -95,7 +89,5 @@ public class Mailer: IMailer
         {
             throw new InvalidOperationException("O nome do remetente não está configurado.");
         }
-
-        return _config;
     }
 }
