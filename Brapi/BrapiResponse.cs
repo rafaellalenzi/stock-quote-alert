@@ -24,7 +24,7 @@ public class Result
     public decimal? FiftyTwoWeekHigh { get; set; }
 }
 
-public class ApiResponse
+public class BrapiResponse
 {
     [JsonPropertyName("results")]
     public List<Result>? Results { get; set; }

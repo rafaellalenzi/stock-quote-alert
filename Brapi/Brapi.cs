@@ -9,7 +9,7 @@ class Brapi : IBrapi
         _httpClient = new HttpClient();
     }
 
-    public async Task<ApiResponse?> GetStockQuoteAsync(string symbol)
+    public async Task<BrapiResponse?> GetStockQuoteAsync(string symbol)
     {
         try
         {
@@ -18,7 +18,7 @@ class Brapi : IBrapi
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<ApiResponse>(jsonResponse, options);
+            return JsonSerializer.Deserialize<BrapiResponse>(jsonResponse, options);
         }
         catch (Exception ex)
         {

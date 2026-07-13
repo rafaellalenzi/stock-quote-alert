@@ -1,4 +1,4 @@
 public interface IBrapi
 {
-    public Task <ApiResponse?> GetStockQuoteAsync(string symbol);
+    public Task <BrapiResponse?> GetStockQuoteAsync(string symbol);
 }
