@@ -9,22 +9,22 @@ if (args.Length != 3)
     return;
 }
 
-bool preçoVenda = decimal.TryParse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal precoVenda);
-bool preçoCompra = decimal.TryParse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal precoCompra);
+bool sellPriceValid = decimal.TryParse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal sellPrice);
+bool buyPriceValid = decimal.TryParse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal buyPrice);
 
-if (!preçoVenda)
+if (!sellPriceValid)
 {
     Console.WriteLine($"ERROR: preço de venda inválido: '{args[1]}'");
     return;
 }
 
-if (!preçoCompra)
+if (!buyPriceValid)
 {
     Console.WriteLine($"ERROR: preço de compra inválido: '{args[2]}'");
     return;
 }
 
-if (precoCompra >= precoVenda)
+if (buyPrice >= sellPrice)
 {
     Console.WriteLine("ERROR: preço de compra deve ser menor que o preço de venda.");
     return;
@@ -39,7 +39,7 @@ try
 
     if (config == null)
     {
-        throw new Exception("Arquivo de configuração inválido, check configuration.json.example.");
+        throw new Exception("Arquivo de configuração inválido, verfique o arquivo configuration.json.example.");
     }
 }
 catch (Exception ex)
@@ -57,8 +57,8 @@ var smtpClient = new SmtpClient(config.Smtp.Host, config.Smtp.Port)
     Credentials = new NetworkCredential(config.Smtp.Username, config.Smtp.Password)
 };
 
-bool alertaVendaAtivo = false;
-bool alertaCompraAtivo = false;
+bool sellAssetAlert = false;
+bool buyAssetAlert = false;
 
 while (true)
 {
@@ -75,66 +75,66 @@ while (true)
         return;
     }
 
-    decimal precoAtual = result.RegularMarketPrice.Value;
+    decimal currentPrice = result.RegularMarketPrice.Value;
 
-    if (precoAtual >= precoVenda)
+    if (currentPrice >= sellPrice)
     {
-        if (!alertaVendaAtivo)
+        if (!sellAssetAlert)
         {
             var mensagem = new MailMessage
             {
                 From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
                 Subject = "Alerta de venda do ativo " + args[0],
-                Body = buildEmailBody(args[0], precoAtual, precoVenda, result, "atingiu o preço de venda de referência", "Considere vender o ativo."),
+                Body = BuildEmailBody(args[0], currentPrice, sellPrice, result, "atingiu o preço de venda de referência", "Considere vender o ativo."),
                 IsBodyHtml = false
             };
             mensagem.To.Add(config.AlertEmail);
             await smtpClient.SendMailAsync(mensagem);
 
-            alertaVendaAtivo = true;
+            sellAssetAlert = true;
         }
     }
     else
     {
-        alertaVendaAtivo = false;
+        sellAssetAlert = false;
     }
 
-    if (precoAtual <= precoCompra)
+    if (currentPrice <= buyPrice)
     {
-        if (!alertaCompraAtivo)
+        if (!buyAssetAlert)
         {
             var mensagem = new MailMessage
             {
                 From = new MailAddress(config.Smtp.FromAddress, config.Smtp.FromName),
                 Subject = "Alerta de compra do ativo " + args[0],
-                Body = buildEmailBody(args[0], precoAtual, precoCompra, result, "atingiu o preço de compra de referência", "Considere comprar o ativo."),
+                Body = BuildEmailBody(args[0], currentPrice, buyPrice, result, "atingiu o preço de compra de referência", "Considere comprar o ativo."),
                 IsBodyHtml = false
             };
             mensagem.To.Add(config.AlertEmail);
             await smtpClient.SendMailAsync(mensagem);
 
-            alertaCompraAtivo = true;
+            buyAssetAlert = true;
         }
     }
     else
     {
-        alertaCompraAtivo = false;
+        buyAssetAlert = false;
     }
 
     await Task.Delay(TimeSpan.FromSeconds(30));
 }
 
-static string buildEmailBody(string ativo, decimal precoAtual, decimal precoLimite, Result result, string tipoAlerta, string sugestao)
+static string BuildEmailBody(string asset, decimal currentPrice, decimal limitPrice, Result result, string alertType, string suggestion)
 {
-    var variacao = result.RegularMarketChangePercent.HasValue
+    var range = result.RegularMarketChangePercent.HasValue
         ? $"{(result.RegularMarketChangePercent.Value >= 0 ? "+" : "")}{result.RegularMarketChangePercent.Value:0.00}%"
         : "Sem dados de variação disponíveis";
 
     return
-        $"O ativo {ativo} atingiu R$ {precoAtual:0.00}, {tipoAlerta} de R$ {precoLimite:0.00}.\n\n" +
-        $"Variação no dia: {variacao}\n" +
+        $"O ativo {asset} atingiu R$ {currentPrice:0.00}, {alertType} de R$ {limitPrice:0.00}.\n\n" +
+        $"Variação no dia: {range}\n" +
         $"Fechamento anterior: R$ {result.RegularMarketPreviousClose:0.00}\n" +
         $"Faixa do dia: R$ {result.RegularMarketDayLow:0.00} - R$ {result.RegularMarketDayHigh:0.00}\n" +
         $"Faixa de 52 semanas: R$ {result.FiftyTwoWeekLow:0.00} - R$ {result.FiftyTwoWeekHigh:0.00}\n\n" +
-        $"\nSugestão: {sugestao}";
+        $"\nSugestão: {suggestion}";
 }
