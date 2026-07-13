@@ -11,6 +11,7 @@ if (args.Length != 3)
 
 bool sellPriceValid = decimal.TryParse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal sellPrice);
 bool buyPriceValid = decimal.TryParse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal buyPrice);
+// CultureInfo.InvariantCulture é usado para garantir que o ponto seja entendido como separador decimal
 
 if (!sellPriceValid)
 {
