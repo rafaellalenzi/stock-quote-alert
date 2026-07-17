@@ -43,7 +43,7 @@ class Brapi : IBrapi
             }
             else if (response?.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                Console.WriteLine($"ERROR: Token de autenticação inválido ou ausente para o Brapi.");
+                Console.WriteLine($"ERROR: Ativo não disponível sem autenticação. Token de autenticação inválido ou ausente para o Brapi.");
             }
             else
             {
