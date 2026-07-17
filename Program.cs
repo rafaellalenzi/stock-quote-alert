@@ -50,7 +50,16 @@ class Program
             return;
         }
 
-        IBrapi brapi = new Brapi();
+        IBrapi brapi;
+        try
+        {
+            brapi = new Brapi();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+            return;
+        }
 
         IMailer mailer;
         try

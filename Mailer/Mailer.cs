@@ -1,6 +1,5 @@
 using System.Net.Mail;
 using System.Net;
-using System.Text.Json;
 
 public class Mailer: IMailer
 {
@@ -8,26 +7,15 @@ public class Mailer: IMailer
 
     public Mailer()
     {
-        string json = File.ReadAllText("configuration.json");
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-    
-        MailerConfig? config;
         try
         {
-            config = JsonSerializer.Deserialize<MailerConfig>(json, options);
+            _config = MailerConfig.Load("configuration.json");
         }
-        catch (JsonException ex)
+        catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException(
-                "O arquivo configuration.json está inválido. Verifique se o arquivo está no formato correto e contém todas as informações necessárias como em configuration.json.example.", ex);
+            throw new InvalidOperationException($"Erro ao carregar a configuração do Mailer: {ex.Message}", ex);
         }
 
-        if (config == null)
-        {
-            throw new InvalidOperationException("O arquivo configuration.json está vazio ou inválido.");
-        }
-
-        _config = config;
         AssertConfiguration();
     }
 

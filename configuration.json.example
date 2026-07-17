@@ -8,5 +8,6 @@
     "Password": "senha-app -> https://myaccount.google.com/apppasswords",
     "FromAddress": "seu-email",
     "FromName": "Stock Quote Alert"
-  }
+  },
+  "BrapiToken": "token-de-autenticacao-brapi"
 }
