@@ -99,9 +99,9 @@ class Program
             {
                 if (!sellAssetAlert)
                 {
-                    var subject = "Alerta de venda do ativo " + args[0];
+                    var subject = "Alerta de venda do ativo " + args[0].ToUpper();
                     var body = BuildEmailBody(
-                        args[0], 
+                        args[0].ToUpper(), 
                         currentPrice, 
                         sellPrice, 
                         result, 
@@ -123,9 +123,9 @@ class Program
             {
                 if (!buyAssetAlert)
                 {
-                    var subject = "Alerta de compra do ativo " + args[0];
+                    var subject = "Alerta de compra do ativo " + args[0].ToUpper();
                     var body = BuildEmailBody(
-                        args[0], 
+                        args[0].ToUpper(), 
                         currentPrice, 
                         buyPrice, 
                         result, 
