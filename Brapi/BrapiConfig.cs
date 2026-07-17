@@ -13,7 +13,14 @@ public class BrapiConfig
 
         string json = File.ReadAllText(filePath);
 
-        return JsonSerializer.Deserialize<BrapiConfig>(json)
-            ?? throw new InvalidOperationException("Configuração Brapi inválida no arquivo de configuração.");
+        try
+        {
+            return JsonSerializer.Deserialize<BrapiConfig>(json)
+                ?? throw new InvalidOperationException("Configuração Brapi inválida no arquivo de configuração.");
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException($"O arquivo '{filePath}' não contém um JSON válido: {ex.Message}", ex);
+        }
     }
 }

@@ -25,7 +25,16 @@ public class MailerConfig
 
         string json = File.ReadAllText(filePath);
 
-        var config = JsonSerializer.Deserialize<MailerConfig>(json);
+        MailerConfig? config;
+        try
+        {
+            config = JsonSerializer.Deserialize<MailerConfig>(json);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException($"O arquivo '{filePath}' não contém um JSON válido: {ex.Message}", ex);
+        }
+
         if (config == null)
         {
             throw new InvalidOperationException("O arquivo configuration.json está vazio ou inválido.");
