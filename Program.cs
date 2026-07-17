@@ -16,6 +16,12 @@ class Program
             return;
         }
 
+        if (args[1].Contains(",") || args[2].Contains(","))
+        {
+            Console.WriteLine("ERROR: Os preços devem ser informados com ponto decimal (ex: 10.00) e não com vírgula.");
+            return;
+        }
+
         bool sellPriceValid = decimal.TryParse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal sellPrice);
         bool buyPriceValid = decimal.TryParse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal buyPrice);
         // CultureInfo.InvariantCulture é usado para garantir que o ponto seja entendido como separador decimal
