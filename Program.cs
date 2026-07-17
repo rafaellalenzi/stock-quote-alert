@@ -6,7 +6,7 @@ class Program
     {
         if (args.Length != 3)
         {
-            Console.WriteLine("ERROR: Uso incorreto. Esperado: stock-quote-alert.exe <ATIVO> <PRECO_VENDA> <PRECO_COMPRA>");
+            Console.WriteLine("ERROR: Uso incorreto. Esperado: stock-quote-alert.exe <ATIVO> <PRECO_VENDA> <PRECO_COMPRA> ou dotnet run -- <ATIVO> <PRECO_VENDA> <PRECO_COMPRA>.");
             return;
         }
 
