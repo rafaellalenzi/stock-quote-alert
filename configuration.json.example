@@ -9,5 +9,5 @@
     "FromAddress": "seu-email",
     "FromName": "Stock Quote Alert"
   },
-  "BrapiToken": "token-de-autenticacao-brapi"
+  "BrapiToken": ""
 }
